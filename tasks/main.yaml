@@ -1,0 +1,64 @@
+---
+
+- name: Check network device OS
+  assert:
+    that: >
+      ansible_network_os == 'nxos' or
+      ansible_network_os == 'ios'
+    msg: "Network device OS not defined or not supported by this role: {{ ansible_network_os }}"
+
+- name: Configure hsrp on interfaces 
+  nxos_hsrp:
+    interface: "{{ item.value.name }}"
+    group: "{{ item.value.hsrp.group | default(omit) }}"
+    state: "{{ item.value.hsrp.state | default(omit) }}"  
+    vip: "{{ item.value.hsrp.vip | default( item.value.ip.address.ipv4_address | ipaddr('1') | ipaddr('address') ) }}"
+    version: "{{ item.value.hsrp.version | default('2') }}"
+    preempt: "{{ item.value.hsrp.preempt | default(omit) }}"
+    priority: "{{ item.value.hsrp.priority | default(omit) }}"
+  with_dict: "{{ interfaces }}"
+  when: >
+    ansible_network_os == 'nxos' and
+    item.value.hsrp is defined
+  tags: 
+    - hsrp_config
+    - nxos
+# The follwoing 4 tasks are here because the nxos_hsrp module doesn't support some of the features like delay reload,
+# preempt delay minimum. Once it does these will be removed and nxos_hsrp used. 
+- name: create temp file
+  tempfile:
+    state: file
+    prefix: ansible_
+    suffix: "_hsrp_{{ inventory_hostname }}"
+  register: network_hsrp_file
+  notify: delete temp file
+  check_mode: no
+  changed_when: false
+  tags:
+    - hsrp_config
+
+- name: Create hsrp extra config in temp file
+  template:
+    src: "{{ ansible_network_os }}_hsrp.j2"
+    dest: "{{ network_hsrp_file.path }}"
+  changed_when: false           
+  tags: 
+    - hsrp_config
+
+- name: display config file content
+  debug: msg="{{ lookup('file', network_hsrp_file.path).split('\n') }}"
+  when: 
+    - hsrp_display_config is defined
+    - hsrp_display_config
+  ignore_errors: true
+  tags: 
+    - hsrp_config 
+
+- name: Push hsrp config to nxos
+  nxos_config:
+    src: "{{ network_hsrp_file.path }}"    
+  when: >
+    ansible_network_os == 'nxos'
+  tags: 
+    - hsrp_config
+    - nxos
