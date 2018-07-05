@@ -41,7 +41,8 @@
   template:
     src: "{{ ansible_network_os }}_hsrp.j2"
     dest: "{{ network_hsrp_file.path }}"
-  changed_when: false           
+  changed_when: false 
+  check_mode: no          
   tags: 
     - hsrp_config
 
@@ -51,6 +52,7 @@
     - hsrp_display_config is defined
     - hsrp_display_config
   ignore_errors: true
+  check_mode: no
   tags: 
     - hsrp_config 
 
@@ -62,3 +64,13 @@
   tags: 
     - hsrp_config
     - nxos
+
+- name: delete temp file
+  file:
+    path: "{{ network_hsrp_file.path }}"
+    state: absent
+  check_mode: no 
+  changed_when: false   
+  tags: 
+    - hsrp_config 
+
