@@ -1,25 +1,25 @@
-{% for int_type,int_id in interfaces.items() %}
-  {% for int, int_value in int_id.items() %}
+{% for int_type,int_id in interfaces.items() -%}
+  {%- for int, int_value in int_id.items() %}
 
     {%- if 'hsrp' in int_value -%}
-interface {{ int_type }}{{int}}{{ "\n" }}
+interface {{ int_type }}{{int}}{{ '\n' }}
 
       {%- if 'delay_reload' in int_value.hsrp %}
-  hsrp delay reload {{ int_value.hsrp.delay_reload }}{{ "\n" }}
+  hsrp delay reload {{ int_value.hsrp.delay_reload }}{{ '\n' }}
       {%- endif -%}
 
       {%- if 'group' in int_value.hsrp %}
-  hsrp {{ int_value.hsrp.group }}{{ "\n" }}
+  hsrp {{ int_value.hsrp.group }}{{ '\n' }}
       {%- else %}
-  hsrp {{ int }}{{ "\n" }}
+  hsrp {{ int }}{{ '\n' }}
       {%- endif -%}
 
       {%- if 'preempt_delay_min' in int_value.hsrp %}
-    preempt delay minimum {{ int_value.hsrp.preempt_delay_min }}{{ "\n" }}
+    preempt delay minimum {{ int_value.hsrp.preempt_delay_min }}{{ '\n' }}
       {%- endif -%}
 
       {%- if int_value.hsrp.auth is sameas true and 'key_chain' in int_value.hsrp %}
-    authentication md5 key-chain {{ int_value.hsrp.key_chain }}{{ "\n" }}
+    authentication md5 key-chain {{ int_value.hsrp.key_chain }}{{ '\n' }}
       {%- endif -%}
 
     {%- endif -%}
