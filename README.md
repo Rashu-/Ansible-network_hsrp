@@ -18,7 +18,7 @@ Feature hsrp has to be enabled. SVI must exist before using this. Cannot be conf
   hosts: switches
     vars:
       interfaces:
-        Vlan
+        Vlan:
           11:
             hsrp:
               group: 11
