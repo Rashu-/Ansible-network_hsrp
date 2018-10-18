@@ -14,6 +14,26 @@ Feature hsrp has to be enabled. SVI must exist before using this. Cannot be conf
 ```yaml
 ---
 
+- name: Example of how to create a vlan interface with hsrp
+  hosts: switches
+    vars:
+      interfaces:
+        Vlan
+          11:
+            hsrp:
+              group: 11
+              state: present
+              preempt: enabled
+              preempt_delay_min: 240
+              delay_reload: 180
+              priority: 130
+              auth: true                            # set to true if you want to configure hsrp authentication using the key_chain defined below
+              key_chain: hsrp                           # has to be defined if auth is true
+              version: 2                          # role default version 2
+              vip: 11.11.11.1                      # if vip is not defined it uses the first IP in the ipv4_address subnet defined for the interface
+  roles:
+    - ansible-network_hsrp
+
 
   
 
