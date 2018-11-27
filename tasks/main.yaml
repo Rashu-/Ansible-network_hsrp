@@ -12,7 +12,7 @@
     interface: "{{ item.name }}"
     group: "{{ item.hsrp.group | default(omit) }}"
     state: "{{ item.hsrp.state | default(omit) }}"  
-    vip: "{{ item.hsrp.vip | default( item.ip.address.ipv4_address | ipaddr('1') | ipaddr('address') ) }}"
+    vip: "{{ item.hsrp.vip | default( item.ip.address.ipv4_address | ipaddr(1) | ipaddr('address') ) }}"
     version: "{{ item.hsrp.version | default('2') }}"
     preempt: "{{ item.hsrp.preempt | default(omit) }}"
     priority: "{{ item.hsrp.priority | default(omit) }}"
